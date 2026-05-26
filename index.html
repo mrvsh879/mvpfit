@@ -3,6 +3,305 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitMVP — персональный фитнес-планер</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div>
+        <div class="brand">FitMVP</div>
+        <div class="tagline">Месячный план тренировок, прогресс и live-режим</div>
+      </div>
+      <div class="top-actions">
+        <button class="ghost-btn" id="printBtn">Печать</button>
+        <button class="danger-btn" id="resetBtn">Сброс</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-card">
+          <div class="eyebrow">MVP под GitHub Pages</div>
+          <h1>Персональный спортивный дневник на 4 недели</h1>
+          <p>
+            Заполни анкету, получи план под твой инвентарь, запускай тренировку с таймером,
+            отмечай упражнения и смотри итоговый результат.
+          </p>
+          <div class="hero-grid">
+            <div><b>Инвентарь:</b> скамья, гриф, блины 80 кг, гантели, дорожка, груша, турник, резинка.</div>
+            <div><b>Фокус:</b> сила, форма, жиросжигание, выносливость, растяжка.</div>
+          </div>
+        </div>
+        <div class="status-card">
+          <div class="status-title">Твой статус</div>
+          <div class="level-row">
+            <span id="levelName">Новичок</span>
+            <span id="pointsCount">0 XP</span>
+          </div>
+          <div class="progress-bar">
+            <div id="xpBar"></div>
+          </div>
+          <div class="mini-stats">
+            <div><b id="doneWorkouts">0</b><span>тренировок</span></div>
+            <div><b id="streakCount">0</b><span>серия</span></div>
+            <div><b id="monthProgress">0%</b><span>месяц</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid-layout">
+        <aside class="panel">
+          <h2>1. Анкета</h2>
+          <form id="profileForm" class="form">
+            <label>Возраст
+              <input type="number" id="age" min="14" max="90" placeholder="Напр. 28" required>
+            </label>
+
+            <div class="two-cols">
+              <label>Рост, см
+                <input type="number" id="height" min="120" max="230" placeholder="180" required>
+              </label>
+              <label>Вес, кг
+                <input type="number" id="weight" min="35" max="250" step="0.1" placeholder="90" required>
+              </label>
+            </div>
+
+            <div class="two-cols">
+              <label>Целевой вес, кг
+                <input type="number" id="targetWeight" min="35" max="250" step="0.1" placeholder="84" required>
+              </label>
+              <label>Дней в неделю
+                <select id="daysPerWeek">
+                  <option value="3">3</option>
+                  <option value="4" selected>4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                </select>
+              </label>
+            </div>
+
+            <label>Цель
+              <select id="goal">
+                <option value="fatloss">Похудение + форма</option>
+                <option value="strength">Сила</option>
+                <option value="muscle">Мышцы / тонус</option>
+                <option value="endurance">Выносливость</option>
+              </select>
+            </label>
+
+            <label>Опыт
+              <select id="experience">
+                <option value="beginner">Новичок / перерыв</option>
+                <option value="intermediate">Средний</option>
+                <option value="advanced">Опытный</option>
+              </select>
+            </label>
+
+            <div class="three-cols">
+              <label>Жим, кг
+                <input type="number" id="bench" min="0" max="250" placeholder="0">
+              </label>
+              <label>Присед, кг
+                <input type="number" id="squat" min="0" max="250" placeholder="0">
+              </label>
+              <label>Подтягивания
+                <input type="number" id="pullups" min="0" max="50" placeholder="0">
+              </label>
+            </div>
+
+            <label>Ограничения по здоровью
+              <textarea id="health" rows="3" placeholder="Например: колени, спина, давление, сердце, травмы. Если нет — оставь пустым."></textarea>
+            </label>
+
+            <button class="primary-btn" type="submit" id="generatePlanBtn">Сгенерировать план</button>
+          </form>
+
+          <div class="warning-box">
+            <b>Важно:</b> это MVP-планер, не врач. При боли, давлении, проблемах с сердцем,
+            спиной или суставами снижай нагрузку и консультируйся со специалистом.
+          </div>
+        </aside>
+
+        <section class="content">
+          <div class="panel">
+            <div class="section-head">
+              <div>
+                <h2>2. Мотивация и прогноз</h2>
+                <p>Прогноз строится по текущему весу, цели и безопасному темпу.</p>
+              </div>
+              <button class="ghost-btn" id="addMeasurementBtn">Добавить замер</button>
+            </div>
+
+            <div class="motivation-grid">
+              <div class="forecast-card">
+                <span>Прогноз через 30 дней</span>
+                <strong id="forecastWeight">—</strong>
+                <small id="forecastText">Заполни анкету, чтобы увидеть прогноз.</small>
+              </div>
+              <div class="forecast-card">
+                <span>До цели примерно</span>
+                <strong id="weeksToGoal">—</strong>
+                <small>Считается по реальному темпу, без обещаний.</small>
+              </div>
+              <div class="forecast-card">
+                <span>Следующая контрольная точка</span>
+                <strong id="nextCheckpoint">Старт</strong>
+                <small>Замер веса, талии, фото и самочувствия.</small>
+              </div>
+            </div>
+
+            <div class="weight-road">
+              <div class="road-labels">
+                <span id="startWeightLabel">Старт —</span>
+                <span id="targetWeightLabel">Цель —</span>
+              </div>
+              <div class="road">
+                <div id="weightProgressFill"></div>
+                <div id="weightMarker"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="section-head">
+              <div>
+                <h2>3. Расписание тренировок</h2>
+                <p>Нажми “Начать”, чтобы открыть live-режим с таймером и упражнениями по порядку.</p>
+              </div>
+              <button class="ghost-btn" id="exportBtn">Экспорт JSON</button>
+            </div>
+            <div id="planContainer" class="plan-grid empty">
+              <div class="empty-state">
+                Заполни анкету слева и нажми “Сгенерировать план”.
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>4. История тренировок</h2>
+            <div id="historyContainer" class="history-list">
+              <div class="empty-state">Пока нет завершённых тренировок.</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>5. Замеры тела</h2>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Дата</th>
+                    <th>Вес</th>
+                    <th>Талия</th>
+                    <th>Грудь</th>
+                    <th>Рука</th>
+                    <th>Бедро</th>
+                    <th>Самочувствие</th>
+                  </tr>
+                </thead>
+                <tbody id="measurementsBody">
+                  <tr><td colspan="7">Нет замеров.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal hidden" id="workoutModal">
+    <div class="modal-card workout-modal">
+      <div class="modal-top">
+        <div>
+          <div class="eyebrow" id="workoutWeekLabel">Неделя</div>
+          <h2 id="workoutTitle">Тренировка</h2>
+        </div>
+        <button class="icon-btn" id="closeWorkoutBtn">×</button>
+      </div>
+
+      <div class="timer-row">
+        <div>
+          <span>Общее время</span>
+          <strong id="workoutTimer">00:00</strong>
+        </div>
+        <div>
+          <span>Текущее упражнение</span>
+          <strong id="exerciseTimer">00:00</strong>
+        </div>
+        <div>
+          <span>Прогресс</span>
+          <strong id="exerciseCounter">0/0</strong>
+        </div>
+      </div>
+
+      <div class="current-exercise">
+        <div class="exercise-type" id="exerciseType">Разминка</div>
+        <h3 id="exerciseName">—</h3>
+        <p id="exerciseDetails">—</p>
+        <div class="exercise-note" id="exerciseNote">—</div>
+      </div>
+
+      <div class="workout-actions">
+        <button class="primary-btn" id="completeExerciseBtn">Выполнено</button>
+        <button class="ghost-btn" id="skipExerciseBtn">Пропустить</button>
+        <button class="danger-btn" id="finishWorkoutBtn">Завершить тренировку</button>
+      </div>
+
+      <div class="exercise-list" id="liveExerciseList"></div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="measurementModal">
+    <div class="modal-card">
+      <div class="modal-top">
+        <h2>Новый замер</h2>
+        <button class="icon-btn" id="closeMeasurementBtn">×</button>
+      </div>
+      <form id="measurementForm" class="form">
+        <div class="two-cols">
+          <label>Вес, кг
+            <input type="number" id="mWeight" step="0.1" required>
+          </label>
+          <label>Талия, см
+            <input type="number" id="mWaist" step="0.1">
+          </label>
+        </div>
+        <div class="three-cols">
+          <label>Грудь
+            <input type="number" id="mChest" step="0.1">
+          </label>
+          <label>Рука
+            <input type="number" id="mArm" step="0.1">
+          </label>
+          <label>Бедро
+            <input type="number" id="mThigh" step="0.1">
+          </label>
+        </div>
+        <label>Самочувствие
+          <select id="mFeeling">
+            <option>Отлично</option>
+            <option>Нормально</option>
+            <option>Усталость</option>
+            <option>Плохо</option>
+          </select>
+        </label>
+        <button class="primary-btn" type="submit">Сохранить замер</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FitPlan — персональный фитнес-планер</title>
   <link rel="stylesheet" href="style.css" />
 </head>
